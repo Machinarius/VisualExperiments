@@ -41,7 +41,7 @@ namespace SmartRockets {
       rocketTexture.SetData(colorData);
 
       var bounds = GraphicsDevice.Viewport.Bounds;
-      var startingPoint = new Vector2((int)(bounds.Width / 1.5), bounds.Height / 2);
+      var startingPoint = new Vector2((int)(bounds.Width / 2), bounds.Height - RocketHeight);
       launcher = new RocketLauncher(startingPoint, bounds);
 
       base.Initialize();

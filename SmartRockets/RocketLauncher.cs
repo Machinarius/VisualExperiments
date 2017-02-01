@@ -43,7 +43,7 @@ namespace SmartRockets {
     private void InitSwarm() {
       swarm = new Rocket[RocketSwarmSwize];
       for (var i = 0; i < RocketSwarmSwize; i++) {
-        swarm[i] = new Rocket(location, new RocketController());
+        swarm[i] = new Rocket(location, operationArea, new RocketController(RocketLifespan));
       }
     }
   }
