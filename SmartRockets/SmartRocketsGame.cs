@@ -8,11 +8,15 @@ namespace SmartRockets {
   /// This is the main type for your game.
   /// </summary>
   public class SmartRocketsGame : Game {
+    private const int RocketWidth = 20;
+    private const int RocketHeight = 10;
+
     GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
 
-    Rocket sampleRocket;
-    RocketController sampleController;
+    Texture2D rocketTexture;
+
+    RocketLauncher launcher;
 
     public SmartRocketsGame() {
       graphics = new GraphicsDeviceManager(this);
@@ -28,10 +32,17 @@ namespace SmartRockets {
     protected override void Initialize() {
       // TODO: Add your initialization logic here
 
+      var colorData = new Color[RocketWidth * RocketHeight];
+      rocketTexture = new Texture2D(GraphicsDevice, RocketWidth, RocketHeight);
+
+      for (var i = 0; i < colorData.Length; i++) {
+        colorData[i] = Color.White;
+      }
+      rocketTexture.SetData(colorData);
+
       var bounds = GraphicsDevice.Viewport.Bounds;
       var startingPoint = new Vector2((int)(bounds.Width / 1.5), bounds.Height / 2);
-      sampleController = new RocketController();
-      sampleRocket = new Rocket(startingPoint, sampleController);
+      launcher = new RocketLauncher(startingPoint, bounds);
 
       base.Initialize();
     }
@@ -69,7 +80,7 @@ namespace SmartRockets {
       // TODO: Add your update logic here
 
       if (callUpdate) {
-        sampleRocket.Update();
+        launcher.Update();
         callUpdate = false;
       } else {
         callUpdate = true;
@@ -87,7 +98,11 @@ namespace SmartRockets {
 
       // TODO: Add your drawing code here
       spriteBatch.Begin();
-      DrawRocket(sampleRocket);
+      
+      foreach (var rocket in launcher.Rockets) {
+        DrawRocket(rocket);
+      }
+        
       spriteBatch.End();
 
       base.Draw(gameTime);
@@ -97,23 +112,11 @@ namespace SmartRockets {
       if (rocket == null) {
         throw new ArgumentNullException(nameof(rocket));
       }
-
-      var rocketWidth = 20;
-      var rocketHeight = 10;
-
-      var shapeData = new Color[rocketWidth * rocketHeight];
-      var shapeTexture = new Texture2D(GraphicsDevice, rocketWidth, rocketHeight);
-
-      for (var i = 0; i < shapeData.Length; i++) {
-        shapeData[i] = Color.White;
-      }
-
-      var velocityVector = new Vector2(sampleRocket.Velocity.X, sampleRocket.Velocity.Y);
-      //velocityVector.Normalize();
+      
+      var velocityVector = new Vector2(rocket.Velocity.X, rocket.Velocity.Y);
       var rocketAngle = (float)Math.Atan2(velocityVector.Y, velocityVector.X);
-
-      shapeTexture.SetData(shapeData);
-      spriteBatch.Draw(shapeTexture, position: rocket.CurrentLocation, color: Color.White, rotation: rocketAngle);
+      
+      spriteBatch.Draw(rocketTexture, position: rocket.CurrentLocation, color: Color.White, rotation: rocketAngle);
     }
   }
 }

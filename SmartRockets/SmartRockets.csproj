@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Rocket.cs" />
     <Compile Include="RocketController.cs" />
+    <Compile Include="RocketLauncher.cs" />
     <Compile Include="SmartRocketsGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
