@@ -11,7 +11,8 @@ namespace SmartRockets {
 
     public bool Crashed { get; private set; }
 
-    private RocketController controller;
+    public RocketController Controller { get; private set; }
+
     private Rectangle operatingArea;
 
     public Rocket(Vector2 location, Rectangle operatingArea, RocketController controller) {
@@ -20,7 +21,7 @@ namespace SmartRockets {
       }
 
       CurrentLocation = location;
-      this.controller = controller;
+      Controller = controller;
       this.operatingArea = operatingArea;
     }
 
@@ -29,16 +30,13 @@ namespace SmartRockets {
         return;
       }
       
-      var heading = controller.GetNextHeading();
+      var heading = Controller.GetNextHeading();
 
       Velocity = Vector2.Add(Velocity, heading);
       Velocity = Vector2.Clamp(Velocity, new Vector2(MaxSpeed * -1), new Vector2(MaxSpeed));
       CurrentLocation = Vector2.Add(CurrentLocation, Velocity);
 
-      if (!operatingArea.Contains(CurrentLocation)) {
-        Crashed = true;
-        return;
-      }
+      Crashed = !operatingArea.Contains(CurrentLocation);
     }
   }
 }
