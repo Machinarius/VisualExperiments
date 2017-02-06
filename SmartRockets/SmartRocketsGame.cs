@@ -11,12 +11,17 @@ namespace SmartRockets {
     private const int RocketWidth = 20;
     private const int RocketHeight = 10;
 
+    private const int TargetSize = 30;
+
     GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
 
+    Texture2D targetTexture;
     Texture2D rocketTexture;
 
     RocketLauncher launcher;
+
+    Vector2 target;
 
     public SmartRocketsGame() {
       graphics = new GraphicsDeviceManager(this);
@@ -32,7 +37,9 @@ namespace SmartRockets {
     protected override void Initialize() {
       // TODO: Add your initialization logic here
 
-      var colorData = new Color[RocketWidth * RocketHeight];
+      Color[] colorData;
+      
+      colorData = new Color[RocketWidth * RocketHeight];
       rocketTexture = new Texture2D(GraphicsDevice, RocketWidth, RocketHeight);
 
       for (var i = 0; i < colorData.Length; i++) {
@@ -40,9 +47,18 @@ namespace SmartRockets {
       }
       rocketTexture.SetData(colorData);
 
+      colorData = new Color[TargetSize * TargetSize];
+      targetTexture = new Texture2D(GraphicsDevice, TargetSize, TargetSize);
+
+      for (var i = 0; i < colorData.Length; i++) {
+        colorData[i] = Color.LightGray;
+      }
+      targetTexture.SetData(colorData);
+
       var bounds = GraphicsDevice.Viewport.Bounds;
-      var target = new Vector2((int)(bounds.Width / 2), (int)(bounds.Height / 0.25));
-      var startingPoint = new Vector2((int)(bounds.Width / 2), bounds.Height - RocketHeight);
+      target = new Vector2((int)(bounds.Width / 2), (int)(bounds.Height * 0.25));
+
+      var startingPoint = new Vector2((int)(bounds.Width / 2), bounds.Height - RocketHeight * 2);
       launcher = new RocketLauncher(startingPoint, bounds, target);
 
       base.Initialize();
@@ -103,6 +119,8 @@ namespace SmartRockets {
       foreach (var rocket in launcher.Rockets) {
         DrawRocket(rocket);
       }
+
+      DrawTarget();
         
       spriteBatch.End();
 
@@ -118,6 +136,10 @@ namespace SmartRockets {
       var rocketAngle = (float)Math.Atan2(velocityVector.Y, velocityVector.X);
       
       spriteBatch.Draw(rocketTexture, position: rocket.CurrentLocation, color: Color.White, rotation: rocketAngle);
+    }
+
+    private void DrawTarget() {
+      spriteBatch.Draw(targetTexture, position: target, color: Color.LightGray);
     }
   }
 }

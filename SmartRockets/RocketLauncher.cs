@@ -44,6 +44,8 @@ namespace SmartRockets {
       }
     }
 
+    private static Random random = new Random();
+
     private void InitSwarm() {
       if (swarm == null) {
         swarm = new Rocket[RocketSwarmSwize];
@@ -58,14 +60,43 @@ namespace SmartRockets {
         Rocket = rocket,
         Fitness = CalculateControllerFitness(rocket)
       }).ToArray();
+
+      var totalFitness = rocketsWithFitness.Select(x => x.Fitness).Sum();
+      var fitnessMap = rocketsWithFitness.SelectMany(x =>
+        Enumerable.Range(0, x.Fitness).Select(_ => x.Rocket).ToArray()).ToArray();
+
+      foreach (var i in Enumerable.Range(0, RocketSwarmSwize)) {
+        var firstRocket = fitnessMap[random.Next(totalFitness)];
+        var secondRocket = fitnessMap[random.Next(totalFitness)];
+
+        var breakpoint = (int)(RocketLifespan * random.NextDouble());
+
+        var mergedMoves = new Vector2[RocketLifespan];
+        foreach (var j in Enumerable.Range(0, RocketLifespan)) {
+          if (random.NextDouble() < 0.01) {
+            mergedMoves[j] = RocketController.GenerateRandomMove();
+            continue;
+          }
+
+          if (j <= breakpoint) {
+            mergedMoves[j] = firstRocket.Controller.Moves[j];
+          } else {
+            mergedMoves[j] = secondRocket.Controller.Moves[j];
+          }
+        }
+
+        var mergedController = new RocketController(mergedMoves);
+        swarm[i] = new Rocket(location, operationArea, mergedController);
+      }
     }
 
-    private float CalculateControllerFitness(Rocket rocket) {
+    private int CalculateControllerFitness(Rocket rocket) {
       if (rocket == null) {
         throw new ArgumentNullException(nameof(rocket));
       }
 
       var distanceToTarget = Vector2.Subtract(rocket.CurrentLocation, target).Length();
+
       float fitness;
 
       if (distanceToTarget != 0) {
@@ -78,7 +109,11 @@ namespace SmartRockets {
         fitness = 1;
       }
 
-      return fitness;
+      return (int)fitness;
+    }
+
+    private float Map(float value, Vector2 sourceRange, Vector2 targetRange) {
+      return ((value - sourceRange.X) / (targetRange.X - sourceRange.X)) * (targetRange.Y - sourceRange.Y) + targetRange.Y;
     }
   }
 }
