@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework;
 
 namespace SmartRockets {
   class RocketLauncher {
+    private const int MaxFitness = 50;
+
     private const int RocketLifespan = 200;
     private const int RocketSwarmSwize = 50;
 
@@ -95,25 +97,34 @@ namespace SmartRockets {
         throw new ArgumentNullException(nameof(rocket));
       }
 
-      var distanceToTarget = Vector2.Subtract(rocket.CurrentLocation, target).Length();
-
+      var distanceToTarget = Vector2.Subtract(rocket.CurrentLocation, target).Length() / 100;
       float fitness;
 
-      if (distanceToTarget != 0) {
-        fitness = 1 / distanceToTarget;
+      if (distanceToTarget == 0) {
+        fitness = MaxFitness;
       } else {
+        fitness = 1 / distanceToTarget;
+      }
+
+      if (rocket.Crashed) {
+        fitness /= 10;
+      }
+
+      fitness *= 10;
+
+      if (fitness < 1) {
         fitness = 1;
       }
 
-      if (fitness < 1 || rocket.Crashed) {
-        fitness = 1;
+      if (fitness > MaxFitness) {
+        fitness = MaxFitness;
       }
 
+
+      fitness = (float)Math.Floor(Math.Abs(fitness));
+
+      System.Diagnostics.Debug.WriteLine("Calculated fitness: " + fitness);
       return (int)fitness;
-    }
-
-    private float Map(float value, Vector2 sourceRange, Vector2 targetRange) {
-      return ((value - sourceRange.X) / (targetRange.X - sourceRange.X)) * (targetRange.Y - sourceRange.Y) + targetRange.Y;
     }
   }
 }

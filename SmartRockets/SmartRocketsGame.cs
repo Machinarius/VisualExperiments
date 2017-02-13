@@ -82,9 +82,7 @@ namespace SmartRockets {
     protected override void UnloadContent() {
       // TODO: Unload any non ContentManager content here
     }
-
-    bool callUpdate;
-
+    
     /// <summary>
     /// Allows the game to run logic such as updating the world,
     /// checking for collisions, gathering input, and playing audio.
@@ -95,13 +93,8 @@ namespace SmartRockets {
         Exit();
 
       // TODO: Add your update logic here
-
-      if (callUpdate) {
-        launcher.Update();
-        callUpdate = false;
-      } else {
-        callUpdate = true;
-      }
+      
+      launcher.Update();
 
       base.Update(gameTime);
     }
